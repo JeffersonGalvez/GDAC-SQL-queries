@@ -1,0 +1,23 @@
+--Aim: Pull station_id, name and number of rides from citibike_trips and citibike_station tables.
+--Using an inner query (nested within FROM) to count the number_of_rides from table 1 (citbike_trips) and group the results by start_station_id.
+--Completed by (inner) joining tables 1 and 2 (citibike_station) on foreign key.
+
+SELECT  
+    station_id,
+    name,
+    number_of_rides AS number_of_rides_starting_at_station
+FROM
+    (
+    SELECT
+        start_station_id,
+        COUNT(*) number_of_rides --This returns the number of rows in the number_of_rides range
+    FROM
+        `bigquery-public-data.new_york_citibike.citibike_trips` --note: different table to outer query table
+        GROUP BY
+        start_station_id
+    ) 
+    AS station_num_trips --Alias for inner query results
+    INNER JOIN --Aggregates citibike_trips table with citibike_stations table based on station_id and start_station_id
+        `bigquery-public-data.new_york_citibike.citibike_stations` ON station_id = start_station_id 
+    ORDER BY
+        number_of_rides DESC;
