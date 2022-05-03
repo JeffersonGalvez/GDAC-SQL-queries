@@ -1,0 +1,9 @@
+SELECT
+    employees.name AS employee_name,
+    employees.role AS employee_role,
+    departments.name AS department_name
+FROM
+    employee_data. employees
+INNER JOIN
+    employee_data. departments ON --joins departments table from employee_data data set to employee table
+    employees. department_id = departments.department_id --states matching key (department_id in this case)
