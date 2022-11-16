@@ -1,31 +1,33 @@
---Find which station the longest-used bike leaves most often.
+-- Find which station the longest-used bike leaves most often.
 
-WITH --Temp table creation
-    longest_used_bike AS ( --longest_used_bike is temp table name
+-- Temp table creation
+-- organises trip_duration values by bikeid i.e. this temp table now shows the TOTAL minutes each bikeid has
+WITH 
+    longest_used_bike AS (
         SELECT
-            bikeid, --selects 2 columns: bikeid and sum of duration_minutes, aliased as below
+            bikeid,
             SUM(duration_minutes) AS trip_duration 
         FROM 
             `bigquery-public-data.austin_bikeshare.bikeshare_trips`
         GROUP BY 
-            bikeid --organises trip_duration values by bikeid i.e. this temp table now shows the TOTAL minutes each bikeid has
+            bikeid 
         ORDER BY
             trip_duration DESC
         LIMIT
-            1
-    )
+            1;
 
---Time to join the temp table witht the original table, to link the bikeid with the most minutes with the station it leaves from the most
+-- Time to join the temp table witht the original table, to link the bikeid with the most minutes with the station it leaves from the most
+-- joins temp table with original table and aliases combined table as trips
 SELECT
-    trips.start_station_id, --start_station_id column chosen from trips table
-    COUNT(*) AS trip_count, --counts total no. of start_station_id as trip_count, i.e. how many times x station has a recorded trip (where someone started from)
+    trips.start_station_id,
+    COUNT(*) AS trip_count
 FROM
-    longest_used_bike AS longest --pulls data from tamp table aliased as longest
-INNER JOIN `bigquery-public-data.austin_bikeshare.bikeshare_trips` AS trips --joins temp table with original table and aliases combined table as trips
-    ON longest.bikeid = trips.bikeid --shared key of temp table and orginial table is bikeid
+    longest_used_bike AS longest
+INNER JOIN `bigquery-public-data.austin_bikeshare.bikeshare_trips` AS trips 
+    ON longest.bikeid = trips.bikeid
 GROUP BY 
-    trips.start_station_id --total no. of stat_station_id is grouped/returned by stat_station_id 
+    trips.start_station_id
 ORDER BY 
     trip_count DESC
 LIMIT
-    1 --returns only 1 row of data (start_station_id with most start_station_id counts/returns)
+    1;
